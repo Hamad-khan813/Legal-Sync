@@ -74,13 +74,21 @@ class CaseNotifier extends StateNotifier<CaseModel?> {
   CaseNotifier(this._service) : super(null);
 
   Future<String> createCase(CaseModel caseModel) async {
-    final id = await _service.createCase(caseModel);
+    final hasCustomId = caseModel.caseId.isNotEmpty;
+    final id = hasCustomId
+        ? caseModel.caseId
+        : await _service.createCaseWithGeneratedId(caseModel);
+
+    if (hasCustomId) {
+      await _service.createCase(caseModel);
+    }
+
     state = caseModel;
     return id;
   }
 
   Future<void> updateCase(CaseModel caseModel) async {
-    await _service.updateCase(caseModel);
+    await _service.updateCase(caseModel.caseId, caseModel.toJson());
     state = caseModel;
   }
 
@@ -99,7 +107,7 @@ class CaseNotifier extends StateNotifier<CaseModel?> {
   }
 
   Future<void> archiveCase(String caseId) async {
-    await _service.archiveCase(caseId);
+    await _service.archiveCase(caseId, true);
   }
 
   Future<void> unarchiveCase(String caseId) async {

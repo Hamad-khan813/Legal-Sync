@@ -30,7 +30,7 @@ class ChatThreadService {
       updatedAt: now,
     );
 
-    await docRef.set(thread.toJson());
+    await docRef.set({...thread.toJson(), 'threadId': docRef.id});
     return docRef.id;
   }
 
@@ -45,7 +45,7 @@ class ChatThreadService {
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
-              .map((doc) => ChatThread.fromJson(doc.data()))
+              .map((doc) => ChatThread.fromMap(doc.data(), doc.id))
               .toList(),
         );
   }
@@ -61,7 +61,7 @@ class ChatThreadService {
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
-              .map((doc) => ChatThread.fromJson(doc.data()))
+              .map((doc) => ChatThread.fromMap(doc.data(), doc.id))
               .toList(),
         );
   }
@@ -73,7 +73,7 @@ class ChatThreadService {
     return _db.collection(_collection).doc(threadId).snapshots().map((doc) {
       final data = doc.data();
       if (data == null) throw Exception('ChatThread not found');
-      return ChatThread.fromJson(data);
+      return ChatThread.fromMap(data, doc.id);
     });
   }
 
@@ -161,5 +161,122 @@ class ChatThreadService {
     }
 
     await threadRef.delete();
+  }
+
+  // ===============================
+  // LEGACY/PROVIDER COMPAT HELPERS
+  // ===============================
+
+  Stream<List<ChatThread>> streamAllThreads() {
+    return _db
+        .collection(_collection)
+        .orderBy('updatedAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ChatThread.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
+  }
+
+  Stream<List<ChatThread>> streamThreadsForCase(String caseId) {
+    return _db
+        .collection(_collection)
+        .where('caseId', isEqualTo: caseId)
+        .orderBy('updatedAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ChatThread.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
+  }
+
+  Stream<List<ChatThread>> streamThreadsForUser(String userId) {
+    return streamAllThreads().map(
+      (threads) => threads
+          .where(
+            (thread) => thread.lawyerId == userId || thread.clientId == userId,
+          )
+          .toList(),
+    );
+  }
+
+  Stream<List<ChatThread>> streamThreadsBetween(
+    String userId1,
+    String userId2,
+  ) {
+    return streamAllThreads().map(
+      (threads) => threads
+          .where(
+            (thread) =>
+                (thread.lawyerId == userId1 && thread.clientId == userId2) ||
+                (thread.lawyerId == userId2 && thread.clientId == userId1),
+          )
+          .toList(),
+    );
+  }
+
+  Future<ChatThread?> getThread(String threadId) async {
+    final doc = await _db.collection(_collection).doc(threadId).get();
+    final data = doc.data();
+    if (!doc.exists || data == null) {
+      return null;
+    }
+    return ChatThread.fromMap(data, doc.id);
+  }
+
+  Stream<int> streamUnreadThreadsCount(String userId) {
+    return streamThreadsForUser(userId).map((threads) {
+      return threads.fold<int>(0, (totalUnread, thread) {
+        if (thread.lawyerId == userId) {
+          return totalUnread + thread.unreadByLawyer;
+        }
+        return totalUnread + thread.unreadByClient;
+      });
+    });
+  }
+
+  Future<void> updateThread(ChatThread thread) async {
+    await _db.collection(_collection).doc(thread.threadId).update({
+      ...thread.toJson(),
+      'updatedAt': Timestamp.now(),
+    });
+  }
+
+  Future<void> addMessageToThread(String threadId, String messageId) async {
+    await _db.collection(_collection).doc(threadId).update({
+      'lastMessageId': messageId,
+      'updatedAt': Timestamp.now(),
+    });
+  }
+
+  Future<void> markThreadAsReadForUser({
+    required String threadId,
+    required String userId,
+  }) async {
+    final thread = await getThread(threadId);
+    if (thread == null) {
+      return;
+    }
+
+    await markThreadAsRead(
+      threadId: threadId,
+      isLawyer: thread.lawyerId == userId,
+    );
+  }
+
+  Future<void> archiveThread(String threadId) async {
+    await _db.collection(_collection).doc(threadId).update({
+      'isArchived': true,
+      'updatedAt': Timestamp.now(),
+    });
+  }
+
+  Future<void> unarchiveThread(String threadId) async {
+    await _db.collection(_collection).doc(threadId).update({
+      'isArchived': false,
+      'updatedAt': Timestamp.now(),
+    });
   }
 }

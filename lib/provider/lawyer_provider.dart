@@ -13,7 +13,7 @@ final lawyerServiceProvider = Provider((ref) => LawyerService());
 // ===============================
 final allLawyersProvider = StreamProvider<List<LawyerModel>>((ref) {
   final service = ref.watch(lawyerServiceProvider);
-  return service.streamAllLawyers();
+  return service.getAllLawyers();
 });
 
 // ===============================
@@ -24,7 +24,7 @@ final getLawyerByIdProvider = FutureProvider.family<LawyerModel?, String>((
   lawyerId,
 ) async {
   final service = ref.watch(lawyerServiceProvider);
-  return service.getLawyer(lawyerId);
+  return service.getLawyerById(lawyerId);
 });
 
 // ===============================
@@ -32,7 +32,11 @@ final getLawyerByIdProvider = FutureProvider.family<LawyerModel?, String>((
 // ===============================
 final verifiedLawyersProvider = StreamProvider<List<LawyerModel>>((ref) {
   final service = ref.watch(lawyerServiceProvider);
-  return service.streamVerifiedLawyers();
+  return service.getAllLawyers().map(
+    (lawyers) => lawyers
+        .where((lawyer) => lawyer.isApproved || lawyer.isVerified)
+        .toList(),
+  );
 });
 
 // ===============================
@@ -41,7 +45,15 @@ final verifiedLawyersProvider = StreamProvider<List<LawyerModel>>((ref) {
 final lawyersBySpecializationProvider =
     StreamProvider.family<List<LawyerModel>, String>((ref, specialization) {
       final service = ref.watch(lawyerServiceProvider);
-      return service.streamLawyersBySpecialization(specialization);
+      final normalized = specialization.toLowerCase().trim();
+      return service.getAllLawyers().map(
+        (lawyers) => lawyers
+            .where(
+              (lawyer) =>
+                  lawyer.specialization.toLowerCase().trim() == normalized,
+            )
+            .toList(),
+      );
     });
 
 // ===============================
@@ -49,7 +61,10 @@ final lawyersBySpecializationProvider =
 // ===============================
 final topRatedLawyersProvider = StreamProvider<List<LawyerModel>>((ref) {
   final service = ref.watch(lawyerServiceProvider);
-  return service.streamTopRatedLawyers();
+  return service.getAllLawyers().map((lawyers) {
+    final sorted = [...lawyers]..sort((a, b) => b.rating.compareTo(a.rating));
+    return sorted;
+  });
 });
 
 // ===============================
@@ -57,7 +72,15 @@ final topRatedLawyersProvider = StreamProvider<List<LawyerModel>>((ref) {
 // ===============================
 final pendingLawyerApprovalsProvider = StreamProvider<List<LawyerModel>>((ref) {
   final service = ref.watch(lawyerServiceProvider);
-  return service.streamPendingApprovals();
+  return service.getAllLawyers().map(
+    (lawyers) => lawyers
+        .where(
+          (lawyer) =>
+              !lawyer.isApproved ||
+              lawyer.approvalStatus.toLowerCase() == 'pending',
+        )
+        .toList(),
+  );
 });
 
 // ===============================
@@ -68,7 +91,8 @@ final lawyerCasesCountProvider = FutureProvider.family<int, String>((
   lawyerId,
 ) async {
   final service = ref.watch(lawyerServiceProvider);
-  return service.getLawyerCasesCount(lawyerId);
+  final lawyer = await service.getLawyerById(lawyerId);
+  return lawyer?.caseIds.length ?? 0;
 });
 
 // ===============================
@@ -79,7 +103,9 @@ final lawyerAvailabilityStatusProvider = FutureProvider.family<bool, String>((
   lawyerId,
 ) async {
   final service = ref.watch(lawyerServiceProvider);
-  return service.isLawyerAvailable(lawyerId);
+  final lawyer = await service.getLawyerById(lawyerId);
+  if (lawyer == null) return false;
+  return lawyer.status.toLowerCase() == 'active';
 });
 
 // ===============================
@@ -91,13 +117,16 @@ class LawyerNotifier extends StateNotifier<LawyerModel?> {
   LawyerNotifier(this._service) : super(null);
 
   Future<String> createLawyer(LawyerModel lawyer) async {
-    final id = await _service.createLawyer(lawyer);
+    await _service.addOrUpdateLawyer(lawyer);
     state = lawyer;
-    return id;
+    return lawyer.lawyerId;
   }
 
   Future<void> updateLawyer(LawyerModel lawyer) async {
-    await _service.updateLawyer(lawyer);
+    await _service.updateLawyer(
+      lawyerId: lawyer.lawyerId,
+      data: lawyer.toJson(),
+    );
     state = lawyer;
   }
 
@@ -107,20 +136,42 @@ class LawyerNotifier extends StateNotifier<LawyerModel?> {
   }
 
   Future<void> loadLawyer(String lawyerId) async {
-    final lawyer = await _service.getLawyer(lawyerId);
+    final lawyer = await _service.getLawyerById(lawyerId);
     state = lawyer;
   }
 
   Future<void> approveLawyer(String lawyerId) async {
-    await _service.approveLawyer(lawyerId);
+    await _service.updateLawyer(
+      lawyerId: lawyerId,
+      data: {
+        'isApproved': true,
+        'approvalStatus': 'approved',
+        'status': 'active',
+        'isVerified': true,
+      },
+    );
+    await loadLawyer(lawyerId);
   }
 
   Future<void> rejectLawyer(String lawyerId, String reason) async {
-    await _service.rejectLawyer(lawyerId, reason);
+    await _service.updateLawyer(
+      lawyerId: lawyerId,
+      data: {
+        'isApproved': false,
+        'approvalStatus': 'rejected',
+        'rejectionReason': reason,
+        'status': 'inactive',
+      },
+    );
+    await loadLawyer(lawyerId);
   }
 
   Future<void> updateRating(String lawyerId, double newRating) async {
-    await _service.updateRating(lawyerId, newRating);
+    await _service.updateLawyer(
+      lawyerId: lawyerId,
+      data: {'rating': newRating},
+    );
+    await loadLawyer(lawyerId);
   }
 }
 

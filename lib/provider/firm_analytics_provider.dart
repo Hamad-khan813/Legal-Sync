@@ -23,7 +23,7 @@ final lawyerStatsProvider = FutureProvider.family<Map<String, dynamic>, String>(
   (ref, lawyerId) async {
     // Note: getLawyerStats requires both lawyerId and firmId
     // This provides basic stats by lawyer ID
-    final service = ref.watch(firmAnalyticsServiceProvider);
+    ref.watch(firmAnalyticsServiceProvider);
     // For simplicity, we'll return empty map - caller should provide firmId
     return {'lawyerId': lawyerId};
   },

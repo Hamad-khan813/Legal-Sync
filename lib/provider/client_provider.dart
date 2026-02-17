@@ -13,7 +13,7 @@ final clientServiceProvider = Provider((ref) => ClientService());
 // ===============================
 final allClientsProvider = StreamProvider<List<ClientModel>>((ref) {
   final service = ref.watch(clientServiceProvider);
-  return service.streamAllClients();
+  return service.getAllClients();
 });
 
 // ===============================
@@ -24,7 +24,7 @@ final getClientByIdProvider = FutureProvider.family<ClientModel?, String>((
   clientId,
 ) async {
   final service = ref.watch(clientServiceProvider);
-  return service.getClient(clientId);
+  return service.getClientById(clientId);
 });
 
 // ===============================
@@ -32,7 +32,9 @@ final getClientByIdProvider = FutureProvider.family<ClientModel?, String>((
 // ===============================
 final verifiedClientsProvider = StreamProvider<List<ClientModel>>((ref) {
   final service = ref.watch(clientServiceProvider);
-  return service.streamVerifiedClients();
+  return service.getAllClients().map(
+    (clients) => clients.where((client) => client.isVerified).toList(),
+  );
 });
 
 // ===============================
@@ -40,7 +42,11 @@ final verifiedClientsProvider = StreamProvider<List<ClientModel>>((ref) {
 // ===============================
 final activeClientsProvider = StreamProvider<List<ClientModel>>((ref) {
   final service = ref.watch(clientServiceProvider);
-  return service.streamActiveClients();
+  return service.getAllClients().map(
+    (clients) => clients
+        .where((client) => client.status.toLowerCase() == 'active')
+        .toList(),
+  );
 });
 
 // ===============================
@@ -50,7 +56,9 @@ final clientsWithPendingPaymentProvider = StreamProvider<List<ClientModel>>((
   ref,
 ) {
   final service = ref.watch(clientServiceProvider);
-  return service.streamClientsWithPendingPayment();
+  return service.getAllClients().map(
+    (clients) => clients.where((client) => client.hasPendingPayment).toList(),
+  );
 });
 
 // ===============================
@@ -61,7 +69,8 @@ final clientCasesCountProvider = FutureProvider.family<int, String>((
   clientId,
 ) async {
   final service = ref.watch(clientServiceProvider);
-  return service.getClientCasesCount(clientId);
+  final client = await service.getClientById(clientId);
+  return client?.caseIds.length ?? 0;
 });
 
 // ===============================
@@ -72,7 +81,8 @@ final clientWalletBalanceProvider = FutureProvider.family<double, String>((
   clientId,
 ) async {
   final service = ref.watch(clientServiceProvider);
-  return service.getWalletBalance(clientId);
+  final client = await service.getClientById(clientId);
+  return client?.walletBalance ?? 0.0;
 });
 
 // ===============================
@@ -84,13 +94,16 @@ class ClientNotifier extends StateNotifier<ClientModel?> {
   ClientNotifier(this._service) : super(null);
 
   Future<String> createClient(ClientModel client) async {
-    final id = await _service.createClient(client);
+    await _service.addOrUpdateClient(client);
     state = client;
-    return id;
+    return client.clientId;
   }
 
   Future<void> updateClient(ClientModel client) async {
-    await _service.updateClient(client);
+    await _service.updateClient(
+      clientId: client.clientId,
+      data: client.toJson(),
+    );
     state = client;
   }
 
@@ -100,28 +113,52 @@ class ClientNotifier extends StateNotifier<ClientModel?> {
   }
 
   Future<void> loadClient(String clientId) async {
-    final client = await _service.getClient(clientId);
+    final client = await _service.getClientById(clientId);
     state = client;
   }
 
   Future<void> approveClient(String clientId) async {
-    await _service.approveClient(clientId);
+    await _service.updateClient(
+      clientId: clientId,
+      data: {'isApproved': true, 'status': 'active'},
+    );
+    await loadClient(clientId);
   }
 
   Future<void> suspendClient(String clientId) async {
-    await _service.suspendClient(clientId);
+    await _service.updateClient(
+      clientId: clientId,
+      data: {'status': 'suspended'},
+    );
+    await loadClient(clientId);
   }
 
   Future<void> addWallet(String clientId, double amount) async {
-    await _service.addWalletBalance(clientId, amount);
+    final client = await _service.getClientById(clientId);
+    if (client == null) return;
+
+    await _service.updateClient(
+      clientId: clientId,
+      data: {'walletBalance': client.walletBalance + amount},
+    );
+    await loadClient(clientId);
   }
 
   Future<void> deductWallet(String clientId, double amount) async {
-    await _service.deductWalletBalance(clientId, amount);
+    final client = await _service.getClientById(clientId);
+    if (client == null) return;
+    final updatedBalance = client.walletBalance - amount;
+
+    await _service.updateClient(
+      clientId: clientId,
+      data: {'walletBalance': updatedBalance < 0 ? 0.0 : updatedBalance},
+    );
+    await loadClient(clientId);
   }
 
   Future<void> bookLawyer(String clientId, String lawyerId) async {
-    await _service.bookLawyer(clientId, lawyerId);
+    await _service.bookLawyer(clientId: clientId, lawyerId: lawyerId);
+    await loadClient(clientId);
   }
 }
 

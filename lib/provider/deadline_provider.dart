@@ -59,7 +59,7 @@ class DeadlineNotifier extends StateNotifier<DeadlineModel?> {
   DeadlineNotifier(this._service) : super(null);
 
   Future<void> createDeadline(DeadlineModel deadline) async {
-    final id = await _service.createDeadline(deadline);
+    await _service.createDeadline(deadline);
     state = deadline.copyWith();
   }
 

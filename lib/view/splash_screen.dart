@@ -43,7 +43,13 @@ class _SplashScreenState extends State<SplashScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // App Logo
-            Image.asset("assets/images/logo.png", width: 140, height: 140),
+            Image.asset(
+              "images/hamad.png",
+              width: 140,
+              height: 140,
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.gavel, size: 100, color: Colors.white),
+            ),
             const SizedBox(height: 20),
             const Text(
               "LegalSync",

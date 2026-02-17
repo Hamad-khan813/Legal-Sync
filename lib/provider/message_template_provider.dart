@@ -52,7 +52,7 @@ final mostUsedTemplatesProvider =
       lawyerId,
     ) async {
       final service = ref.watch(messageTemplateServiceProvider);
-      return service.getMostUsedTemplates(lawyerId, limit: 10);
+      return service.getMostUsedTemplates(lawyerId, 10);
     });
 
 // ===============================
@@ -64,7 +64,7 @@ final recentlyUsedTemplatesProvider =
       lawyerId,
     ) async {
       final service = ref.watch(messageTemplateServiceProvider);
-      return service.getRecentlyUsedTemplates(lawyerId, limit: 10);
+      return service.getRecentlyUsedTemplates(lawyerId, 10);
     });
 
 // ===============================

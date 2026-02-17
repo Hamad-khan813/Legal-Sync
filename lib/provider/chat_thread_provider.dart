@@ -75,7 +75,11 @@ class ChatThreadNotifier extends StateNotifier<ChatThreadModel?> {
   ChatThreadNotifier(this._service) : super(null);
 
   Future<String> createThread(ChatThreadModel thread) async {
-    final id = await _service.createThread(thread);
+    final id = await _service.createThread(
+      lawyerId: thread.lawyerId,
+      clientId: thread.clientId,
+      caseId: thread.caseId,
+    );
     state = thread;
     return id;
   }
@@ -100,7 +104,7 @@ class ChatThreadNotifier extends StateNotifier<ChatThreadModel?> {
   }
 
   Future<void> markThreadAsRead(String threadId, String userId) async {
-    await _service.markThreadAsRead(threadId, userId);
+    await _service.markThreadAsReadForUser(threadId: threadId, userId: userId);
   }
 
   Future<void> archiveThread(String threadId) async {

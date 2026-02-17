@@ -22,7 +22,7 @@ final allNotificationsProvider = StreamProvider<List<NotificationModel>>((ref) {
 final userNotificationsProvider =
     StreamProvider.family<List<NotificationModel>, String>((ref, userId) {
       final service = ref.watch(notificationServiceProvider);
-      return service.streamUserNotifications(userId);
+      return service.streamNotificationsByUser(userId);
     });
 
 // ===============================
@@ -66,9 +66,9 @@ class NotificationNotifier extends StateNotifier<NotificationModel?> {
   NotificationNotifier(this._service) : super(null);
 
   Future<String> createNotification(NotificationModel notification) async {
-    final id = await _service.createNotification(notification);
+    await _service.addNotification(notification);
     state = notification;
-    return id;
+    return notification.notificationId;
   }
 
   Future<void> updateNotification(NotificationModel notification) async {
@@ -86,7 +86,7 @@ class NotificationNotifier extends StateNotifier<NotificationModel?> {
   }
 
   Future<void> markAllAsRead(String userId) async {
-    await _service.markAllAsRead(userId);
+    await _service.markAllRead(userId);
   }
 
   Future<void> loadNotification(String notificationId) async {
@@ -97,7 +97,9 @@ class NotificationNotifier extends StateNotifier<NotificationModel?> {
   Future<void> sendBulkNotifications(
     List<NotificationModel> notifications,
   ) async {
-    await _service.sendBulkNotifications(notifications);
+    for (final notification in notifications) {
+      await _service.addNotification(notification);
+    }
   }
 }
 

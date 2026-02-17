@@ -26,7 +26,7 @@ class ChatService {
   /// =========================
   /// SEND MESSAGE
   /// =========================
-  Future<void> sendMessage({
+  Future<String> sendMessage({
     required String senderId,
     required String receiverId,
     required String message,
@@ -49,6 +49,7 @@ class ChatService {
     );
 
     await docRef.set(newMessage.toMap());
+    return docRef.id;
   }
 
   /// =========================
@@ -109,5 +110,124 @@ class ChatService {
     await _messagesRef(
       chatId,
     ).doc(messageId).update({'isDeleted': true, 'message': 'Message deleted'});
+  }
+
+  // =========================
+  // LEGACY/PROVIDER COMPAT HELPERS
+  // =========================
+
+  Stream<List<ChatMessage>> streamAllMessages() {
+    return _db
+        .collectionGroup('messages')
+        .orderBy('sentAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ChatMessage.fromMap(doc.data(), doc.id))
+              .toList(),
+        );
+  }
+
+  Stream<List<ChatMessage>> streamMessagesBetween(
+    String userId1,
+    String userId2,
+  ) {
+    return getMessages(userId1, userId2);
+  }
+
+  // Case-based chat is handled by chat threads; keep this safe fallback.
+  Stream<List<ChatMessage>> streamMessagesByCase(String caseId) {
+    return Stream<List<ChatMessage>>.value(const <ChatMessage>[]);
+  }
+
+  Stream<List<ChatMessage>> streamUserMessages(String userId) {
+    return streamAllMessages().map(
+      (messages) => messages
+          .where(
+            (message) =>
+                message.senderId == userId || message.receiverId == userId,
+          )
+          .toList(),
+    );
+  }
+
+  Stream<int> streamUnreadCount(String userId) {
+    return streamUserMessages(userId).map(
+      (messages) => messages
+          .where((message) => message.receiverId == userId && !message.isRead)
+          .length,
+    );
+  }
+
+  Future<ChatMessage?> getMessage(String messageId) async {
+    final doc = await _findMessageDoc(messageId);
+    if (doc == null) {
+      return null;
+    }
+    return ChatMessage.fromMap(doc.data(), doc.id);
+  }
+
+  Future<String> sendMessageModel(ChatMessage message) {
+    return sendMessage(
+      senderId: message.senderId,
+      receiverId: message.receiverId,
+      message: message.message,
+      messageType: message.messageType,
+      fileUrl: message.fileUrl,
+      replyTo: message.replyTo,
+    );
+  }
+
+  Future<void> updateMessage(ChatMessage message) {
+    return editMessage(
+      message.senderId,
+      message.receiverId,
+      message.messageId,
+      message.message,
+    );
+  }
+
+  Future<void> deleteMessageById(String messageId) async {
+    final doc = await _findMessageDoc(messageId);
+    if (doc == null) {
+      return;
+    }
+
+    await doc.reference.update({
+      'isDeleted': true,
+      'message': 'Message deleted',
+      'updatedAt': Timestamp.now(),
+    });
+  }
+
+  Future<void> markAsReadById(String messageId) async {
+    final doc = await _findMessageDoc(messageId);
+    if (doc == null) {
+      return;
+    }
+
+    await doc.reference.update({'isRead': true, 'updatedAt': Timestamp.now()});
+  }
+
+  Future<void> markAsReadBatch(List<String> messageIds) async {
+    for (final messageId in messageIds) {
+      await markAsReadById(messageId);
+    }
+  }
+
+  Future<QueryDocumentSnapshot<Map<String, dynamic>>?> _findMessageDoc(
+    String messageId,
+  ) async {
+    final snapshot = await _db
+        .collectionGroup('messages')
+        .where('messageId', isEqualTo: messageId)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) {
+      return null;
+    }
+
+    return snapshot.docs.first;
   }
 }

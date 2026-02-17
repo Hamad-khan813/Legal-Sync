@@ -8,7 +8,7 @@ class TimeTrackingService {
   final FirebaseFirestore _firestore;
   static const String _collection = 'time_entries';
 
-  /// 🔹 Start timer - create active time entry
+  // Start timer and create an active entry.
   Future<TimeEntryModel> startTimer({
     required String caseId,
     required String lawyerId,
@@ -35,23 +35,24 @@ class TimeTrackingService {
           .collection(_collection)
           .doc(timeEntryId)
           .set(entry.toJson());
-
       return entry;
     } catch (e) {
       throw Exception('Failed to start timer: $e');
     }
   }
 
-  /// 🔹 Stop timer - calculate duration
+  // Stop timer and finalize the duration.
   Future<TimeEntryModel> stopTimer(String timeEntryId) async {
     try {
       final doc = await _firestore
           .collection(_collection)
           .doc(timeEntryId)
           .get();
-      if (!doc.exists) throw Exception('Time entry not found');
+      if (!doc.exists || doc.data() == null) {
+        throw Exception('Time entry not found');
+      }
 
-      final data = doc.data() as Map<String, dynamic>;
+      final data = doc.data()!;
       final startTime = (data['startTime'] as Timestamp).toDate();
       final endTime = DateTime.now();
       final duration = endTime.difference(startTime).inMinutes;
@@ -78,7 +79,6 @@ class TimeTrackingService {
     }
   }
 
-  /// 🔹 Pause timer
   Future<void> pauseTimer(String timeEntryId) async {
     try {
       await _firestore.collection(_collection).doc(timeEntryId).update({
@@ -90,7 +90,6 @@ class TimeTrackingService {
     }
   }
 
-  /// 🔹 Resume timer
   Future<void> resumeTimer(String timeEntryId) async {
     try {
       await _firestore.collection(_collection).doc(timeEntryId).update({
@@ -102,7 +101,6 @@ class TimeTrackingService {
     }
   }
 
-  /// 🔹 Get total hours for case
   Future<double> getTotalHoursForCase(String caseId) async {
     try {
       final snapshot = await _firestore
@@ -112,7 +110,7 @@ class TimeTrackingService {
           .get();
 
       double totalMinutes = 0;
-      for (var doc in snapshot.docs) {
+      for (final doc in snapshot.docs) {
         final data = doc.data();
         totalMinutes += (data['duration'] ?? 0).toDouble();
       }
@@ -123,7 +121,6 @@ class TimeTrackingService {
     }
   }
 
-  /// 🔹 Get time entries for case
   Stream<List<TimeEntryModel>> getTimeEntriesByCase(String caseId) {
     return _firestore
         .collection(_collection)
@@ -134,7 +131,7 @@ class TimeTrackingService {
           return snapshot.docs
               .map(
                 (doc) => TimeEntryModel.fromJson({
-                  ...doc.data() as Map<String, dynamic>,
+                  ...doc.data(),
                   'timeEntryId': doc.id,
                 }),
               )
@@ -142,7 +139,6 @@ class TimeTrackingService {
         });
   }
 
-  /// 🔹 Get time entries for lawyer
   Stream<List<TimeEntryModel>> getTimeEntriesByLawyer(String lawyerId) {
     return _firestore
         .collection(_collection)
@@ -153,7 +149,7 @@ class TimeTrackingService {
           return snapshot.docs
               .map(
                 (doc) => TimeEntryModel.fromJson({
-                  ...doc.data() as Map<String, dynamic>,
+                  ...doc.data(),
                   'timeEntryId': doc.id,
                 }),
               )
@@ -161,7 +157,6 @@ class TimeTrackingService {
         });
   }
 
-  /// 🔹 Get active timer for lawyer
   Future<TimeEntryModel?> getActiveTimer(String lawyerId) async {
     try {
       final snapshot = await _firestore
@@ -171,19 +166,28 @@ class TimeTrackingService {
           .limit(1)
           .get();
 
-      if (snapshot.docs.isEmpty) return null;
+      if (snapshot.docs.isEmpty) {
+        return null;
+      }
 
       final doc = snapshot.docs.first;
-      return TimeEntryModel.fromJson({
-        ...doc.data() as Map<String, dynamic>,
-        'timeEntryId': doc.id,
-      });
+      return TimeEntryModel.fromJson({...doc.data(), 'timeEntryId': doc.id});
     } catch (e) {
       throw Exception('Failed to get active timer: $e');
     }
   }
 
-  /// 🔹 Update time entry
+  Future<void> createTimeEntry(TimeEntryModel entry) async {
+    try {
+      await _firestore
+          .collection(_collection)
+          .doc(entry.timeEntryId)
+          .set(entry.toJson(), SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('Failed to create time entry: $e');
+    }
+  }
+
   Future<void> updateTimeEntry(
     String timeEntryId,
     Map<String, dynamic> data,
@@ -196,7 +200,6 @@ class TimeTrackingService {
     }
   }
 
-  /// 🔹 Delete time entry
   Future<void> deleteTimeEntry(String timeEntryId) async {
     try {
       await _firestore.collection(_collection).doc(timeEntryId).delete();
@@ -205,7 +208,6 @@ class TimeTrackingService {
     }
   }
 
-  /// 🔹 Get billable hours summary for lawyer
   Future<Map<String, dynamic>> getBillableSummary(String lawyerId) async {
     try {
       final snapshot = await _firestore
@@ -218,7 +220,7 @@ class TimeTrackingService {
       double totalMinutes = 0;
       int entriesCount = 0;
 
-      for (var doc in snapshot.docs) {
+      for (final doc in snapshot.docs) {
         final data = doc.data();
         totalMinutes += (data['duration'] ?? 0).toDouble();
         entriesCount++;

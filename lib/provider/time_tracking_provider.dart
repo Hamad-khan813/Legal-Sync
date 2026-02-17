@@ -3,68 +3,48 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../model/time_entry_Model.dart';
 import '../services/time_tracking_service.dart';
 
-// Service provider
-final timeTrackingServiceProvider = Provider((ref) {
-  return TimeTrackingService();
-});
+final timeTrackingServiceProvider = Provider((ref) => TimeTrackingService());
 
-// Timer state
-final timerStateProvider = StateProvider<bool>((ref) {
-  return false; // false = stopped, true = running
-});
+final timerStateProvider = StateProvider<bool>((ref) => false);
+final currentCaseIdProvider = StateProvider<String?>((ref) => null);
+final currentLawyerIdProvider = StateProvider<String?>((ref) => null);
 
-final currentCaseIdProvider = StateProvider<String?>((ref) {
-  return null;
-});
-
-final currentLawyerIdProvider = StateProvider<String?>((ref) {
-  return null;
-});
-
-// Stream providers for time entry data
-
-/// Stream all time entries for a specific case
 final streamTimeEntriesByCaseProvider =
     StreamProvider.family<List<TimeEntryModel>, String>((ref, caseId) {
       final service = ref.watch(timeTrackingServiceProvider);
-      return service.streamTimeEntriesByCase(caseId);
+      return service.getTimeEntriesByCase(caseId);
     });
 
-/// Stream all time entries for a specific lawyer
 final streamTimeEntriesByLawyerProvider =
     StreamProvider.family<List<TimeEntryModel>, String>((ref, lawyerId) {
       final service = ref.watch(timeTrackingServiceProvider);
-      return service.getTimeEntriesByLawyer(lawyerId).asStream();
+      return service.getTimeEntriesByLawyer(lawyerId);
     });
 
-/// Get total hours for a case (Future provider)
 final getTotalHoursByCaseProvider = FutureProvider.family<double, String>((
   ref,
   caseId,
 ) async {
   final service = ref.watch(timeTrackingServiceProvider);
-  return service.getTotalHoursByCase(caseId);
+  return service.getTotalHoursForCase(caseId);
 });
 
-/// State notifier for managing time tracking state
 class TimeTrackingStateNotifier
     extends StateNotifier<AsyncValue<List<TimeEntryModel>>> {
-  final TimeTrackingService _service;
-
   TimeTrackingStateNotifier(this._service) : super(const AsyncValue.loading());
 
-  /// Start timer
+  final TimeTrackingService _service;
+
   Future<void> startTimer(String caseId, String lawyerId) async {
     try {
       state = const AsyncValue.loading();
-      await _service.startTimer(caseId, lawyerId);
+      await _service.startTimer(caseId: caseId, lawyerId: lawyerId);
       state = const AsyncValue.data([]);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
   }
 
-  /// Stop timer and save time entry
   Future<void> stopTimer(String timeEntryId) async {
     try {
       state = const AsyncValue.loading();
@@ -75,7 +55,6 @@ class TimeTrackingStateNotifier
     }
   }
 
-  /// Create manual time entry
   Future<void> createTimeEntry(TimeEntryModel entry) async {
     try {
       state = const AsyncValue.loading();
@@ -86,7 +65,6 @@ class TimeTrackingStateNotifier
     }
   }
 
-  /// Update time entry
   Future<void> updateTimeEntry(
     String timeEntryId,
     Map<String, dynamic> data,
@@ -100,7 +78,6 @@ class TimeTrackingStateNotifier
     }
   }
 
-  /// Delete time entry
   Future<void> deleteTimeEntry(String timeEntryId) async {
     try {
       state = const AsyncValue.loading();
@@ -111,32 +88,28 @@ class TimeTrackingStateNotifier
     }
   }
 
-  /// Get total hours for case
   Future<double> getTotalHours(String caseId) async {
     try {
-      return await _service.getTotalHoursByCase(caseId);
-    } catch (e) {
-      print('Error getting total hours: $e');
+      return await _service.getTotalHoursForCase(caseId);
+    } catch (_) {
       return 0.0;
     }
   }
 
-  /// Load time entries for case
   Future<void> loadTimeEntriesByCase(String caseId) async {
     try {
       state = const AsyncValue.loading();
-      final entries = await _service.streamTimeEntriesByCase(caseId).first;
+      final entries = await _service.getTimeEntriesByCase(caseId).first;
       state = AsyncValue.data(entries);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
   }
 
-  /// Load time entries for lawyer
   Future<void> loadTimeEntriesByLawyer(String lawyerId) async {
     try {
       state = const AsyncValue.loading();
-      final entries = _service.getTimeEntriesByLawyer(lawyerId);
+      final entries = await _service.getTimeEntriesByLawyer(lawyerId).first;
       state = AsyncValue.data(entries);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -144,7 +117,6 @@ class TimeTrackingStateNotifier
   }
 }
 
-/// State notifier provider for time tracking management
 final timeTrackingStateNotifierProvider =
     StateNotifierProvider<
       TimeTrackingStateNotifier,
@@ -154,7 +126,4 @@ final timeTrackingStateNotifierProvider =
       return TimeTrackingStateNotifier(service);
     });
 
-/// Timer elapsed time provider (in seconds)
-final timerElapsedProvider = StateProvider<int>((ref) {
-  return 0; // seconds
-});
+final timerElapsedProvider = StateProvider<int>((ref) => 0);

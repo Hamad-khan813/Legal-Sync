@@ -81,7 +81,7 @@ class ChatNotifier extends StateNotifier<ChatModel?> {
   ChatNotifier(this._service) : super(null);
 
   Future<String> sendMessage(ChatModel message) async {
-    final id = await _service.sendMessage(message);
+    final id = await _service.sendMessageModel(message);
     state = message;
     return id;
   }
@@ -92,12 +92,12 @@ class ChatNotifier extends StateNotifier<ChatModel?> {
   }
 
   Future<void> deleteMessage(String messageId) async {
-    await _service.deleteMessage(messageId);
+    await _service.deleteMessageById(messageId);
     state = null;
   }
 
   Future<void> markAsRead(String messageId) async {
-    await _service.markAsRead(messageId);
+    await _service.markAsReadById(messageId);
   }
 
   Future<void> markAsReadBatch(List<String> messageIds) async {

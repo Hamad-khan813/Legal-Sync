@@ -14,7 +14,7 @@ final invoiceServiceProvider = Provider((ref) {
 final streamInvoicesByCaseProvider =
     StreamProvider.family<List<InvoiceModel>, String>((ref, caseId) {
       final service = ref.watch(invoiceServiceProvider);
-      return service.getInvoicesByCaseId(caseId);
+      return service.getInvoicesByCase(caseId);
     });
 
 /// Stream all invoices for a specific lawyer
@@ -49,12 +49,13 @@ class InvoiceStateNotifier
   }) async {
     try {
       state = const AsyncValue.loading();
-      await _service.generateInvoice(
+      final invoice = await _service.generateInvoice(
         caseId: caseId,
         lawyerId: lawyerId,
         clientId: clientId,
-        customRatePerHour: customRatePerHour,
+        ratePerHour: customRatePerHour ?? 0,
       );
+      await _service.saveInvoice(invoice);
       state = const AsyncValue.data([]);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -107,7 +108,7 @@ class InvoiceStateNotifier
   Future<void> loadInvoicesByCase(String caseId) async {
     try {
       state = const AsyncValue.loading();
-      final invoices = await _service.getInvoicesByCaseId(caseId).first;
+      final invoices = await _service.getInvoicesByCase(caseId).first;
       state = AsyncValue.data(invoices);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);

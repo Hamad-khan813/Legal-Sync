@@ -100,7 +100,7 @@ class CaseStatusHistoryNotifier extends StateNotifier<CaseStatusHistoryModel?> {
   }
 
   Future<void> createHistory(CaseStatusHistoryModel history) async {
-    final id = await _service.createStatusHistory(history);
+    await _service.createStatusHistory(history);
     state = history;
   }
 

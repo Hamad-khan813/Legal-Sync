@@ -8,9 +8,8 @@
 # The following line activates a set of recommended lints for Flutter apps,
 # packages, and plugins designed to encourage good coding practices.
 analyzer:
-  exclude:
-    - lib/provider/**
   errors:
+    prefer_final_fields: ignore
     unnecessary_cast: ignore
 include: package:flutter_lints/flutter.yaml
 
