@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'package:legal_sync/screens/admin/admin_dashboard_screen.dart';
 import 'package:legal_sync/screens/onboarding/welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -388,7 +389,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           label: 'Microsoft',
                           icon: Icons.window,
                           iconColor: const Color(0xFF00A4EF),
-                          onTap: () {},
+                          onTap: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const AdminDashboardScreen(),
+                              ),
+                            );
+                          },
                         ),
                         const SizedBox(width: 12),
                         _SocialButton(
