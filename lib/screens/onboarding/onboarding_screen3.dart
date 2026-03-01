@@ -30,7 +30,7 @@ class OnboardingPage3 extends StatelessWidget {
               /// Title
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32),
-                child: const Text(
+                child: Text(
                   "Private, Secure,\nConfidential.",
                   textAlign: TextAlign.center,
                   style: TextStyle(
