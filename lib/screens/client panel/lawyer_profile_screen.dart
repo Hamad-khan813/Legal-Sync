@@ -1,0 +1,642 @@
+import 'package:flutter/material.dart';
+import 'messages_screen.dart';
+
+class LawyerProfileScreen extends StatelessWidget {
+  final String name;
+  final String specialty;
+  final double rating;
+  final int reviews;
+  final String location;
+  final String experience;
+  final bool useProfileImage;
+
+  const LawyerProfileScreen({
+    super.key,
+    required this.name,
+    required this.specialty,
+    required this.rating,
+    required this.reviews,
+    required this.location,
+    required this.experience,
+    this.useProfileImage = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F0F0F),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          // App Bar with profile image
+          SliverAppBar(
+            expandedHeight: 280,
+            pinned: true,
+            backgroundColor: const Color(0xFF141414),
+            leading: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.arrow_back_ios_new,
+                  color: Colors.white,
+                  size: 18,
+                ),
+              ),
+            ),
+            actions: [
+              Container(
+                margin: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: IconButton(
+                  onPressed: () {},
+                  icon: const Icon(
+                    Icons.share_outlined,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
+              ),
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              background: Stack(
+                fit: StackFit.expand,
+                children: [
+                  useProfileImage
+                      ? Image.asset(
+                          'assets/images/profile.jpg',
+                          fit: BoxFit.cover,
+                        )
+                      : Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [Color(0xFF1A1A2E), Color(0xFF2D1B69)],
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              name.split(' ').map((e) => e[0]).take(2).join(),
+                              style: const TextStyle(
+                                color: Color(0xFFFF6B00),
+                                fontSize: 72,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                  // Gradient overlay
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 120,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Colors.transparent, Color(0xFF0F0F0F)],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            title: const Text(
+              'Professional Profile',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          // Profile content
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 8),
+
+                  // Name & Title
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    specialty,
+                    style: const TextStyle(
+                      color: Color(0xFF9E9E9E),
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Experience Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFF6B00).withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: const Color(0xFFFF6B00).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.workspace_premium_outlined,
+                          color: Color(0xFFFF6B00),
+                          size: 14,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          '$experience of Distinguished Experience',
+                          style: const TextStyle(
+                            color: Color(0xFFFF6B00),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Action Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFFF6B00),
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Book Consultation',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const MessagesScreen(),
+                              ),
+                            );
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            side: const BorderSide(color: Color(0xFF3A3A3A)),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            'Message',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Stats Row
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A1A1A),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFF252525)),
+                    ),
+                    child: Row(
+                      children: [
+                        _StatItem(
+                          value: '98%',
+                          label: 'Success Rate',
+                          icon: Icons.trending_up,
+                          color: const Color(0xFF059669),
+                        ),
+                        _VerticalDivider(),
+                        _StatItem(
+                          value: '450+',
+                          label: 'Cases Won',
+                          icon: Icons.emoji_events_outlined,
+                          color: const Color(0xFFFF6B00),
+                        ),
+                        _VerticalDivider(),
+                        _StatItem(
+                          value: '$rating',
+                          label: 'Rating',
+                          icon: Icons.star,
+                          color: const Color(0xFFFFB800),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Practice Areas
+                  const Text(
+                    'Specialized Practice Areas',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  _PracticeAreaItem(
+                    icon: Icons.business_center_outlined,
+                    title: 'Corporate M&A',
+                    subtitle: 'Mergers, acquisitions, and deal structuring',
+                    color: const Color(0xFF2563EB),
+                  ),
+                  _PracticeAreaItem(
+                    icon: Icons.gavel,
+                    title: 'Litigation',
+                    subtitle: 'Complex commercial and civil disputes',
+                    color: const Color(0xFFFF6B00),
+                  ),
+                  _PracticeAreaItem(
+                    icon: Icons.lightbulb_outline,
+                    title: 'Intellectual Property',
+                    subtitle: 'Patents, trademarks, and copyright law',
+                    color: const Color(0xFF7C3AED),
+                  ),
+                  _PracticeAreaItem(
+                    icon: Icons.shield_outlined,
+                    title: 'Cyber Governance',
+                    subtitle: 'Data privacy and cyber compliance',
+                    color: const Color(0xFF059669),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Credentials
+                  const Text(
+                    'Credentials & Education',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _CredentialItem(
+                    institution: 'Harvard Law School',
+                    degree: 'Juris Doctor (JD)',
+                    year: '2009',
+                    icon: Icons.school_outlined,
+                  ),
+                  _CredentialItem(
+                    institution: 'Yale University',
+                    degree: 'B.A. Political Science',
+                    year: '2006',
+                    icon: Icons.school_outlined,
+                  ),
+                  _CredentialItem(
+                    institution: 'New York Bar Association',
+                    degree: 'Licensed Attorney',
+                    year: '2010',
+                    icon: Icons.verified_outlined,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Reviews Section
+                  const Text(
+                    'Client Reviews',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  _ReviewCard(
+                    reviewer: 'Michael Chen',
+                    review:
+                        '"Jonathan\'s strategic approach to our acquisition was flawless. His attention to detail and ability to navigate complex regulatory frameworks is unmatched in the corporate sector."',
+                    rating: 5,
+                  ),
+                  const SizedBox(height: 32),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String value;
+  final String label;
+  final IconData icon;
+  final Color color;
+
+  const _StatItem({
+    required this.value,
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, color: color, size: 22),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF6B6B6B), fontSize: 11),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VerticalDivider extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(width: 1, height: 60, color: const Color(0xFF252525));
+  }
+}
+
+class _PracticeAreaItem extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+
+  const _PracticeAreaItem({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF252525)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: color, size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    color: Color(0xFF6B6B6B),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.arrow_forward_ios,
+            color: Color(0xFF3A3A3A),
+            size: 14,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CredentialItem extends StatelessWidget {
+  final String institution;
+  final String degree;
+  final String year;
+  final IconData icon;
+
+  const _CredentialItem({
+    required this.institution,
+    required this.degree,
+    required this.year,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFF252525)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF6B00).withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: const Color(0xFFFF6B00), size: 20),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  institution,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  degree,
+                  style: const TextStyle(
+                    color: Color(0xFF6B6B6B),
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            year,
+            style: const TextStyle(color: Color(0xFF9E9E9E), fontSize: 12),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReviewCard extends StatelessWidget {
+  final String reviewer;
+  final String review;
+  final int rating;
+
+  const _ReviewCard({
+    required this.reviewer,
+    required this.review,
+    required this.rating,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF252525)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2A2A2A),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Center(
+                  child: Text(
+                    reviewer[0],
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      reviewer,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Row(
+                      children: List.generate(
+                        rating,
+                        (_) => const Icon(
+                          Icons.star,
+                          color: Color(0xFFFFB800),
+                          size: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            review,
+            style: const TextStyle(
+              color: Color(0xFF9E9E9E),
+              fontSize: 13,
+              height: 1.5,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

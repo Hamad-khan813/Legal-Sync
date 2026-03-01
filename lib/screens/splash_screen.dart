@@ -1,6 +1,6 @@
 // lib/screens/splash/splash_screen.dart
 import 'package:flutter/material.dart';
-import 'package:legal_sync/view/onboarding/onboarding_screen1.dart';
+import 'package:legal_sync/screens/onboarding/onboarding_screen1.dart';
 
 // import '../home/home_screen.dart'; // You can switch later if you want
 
@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
     // 👉 For now always go to Onboarding (UI only)
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const OnboardingScreen1()),
+      MaterialPageRoute(builder: (_) => const OnboardingPage1()),
     );
 
     // 🔁 Later you can change to:
