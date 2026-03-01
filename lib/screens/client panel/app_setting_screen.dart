@@ -80,7 +80,7 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
                                 width: 2,
                               ),
                               image: const DecorationImage(
-                                image: AssetImage('assets/images/profile.jpg'),
+                                image: AssetImage('images/profile.jpg'),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -333,32 +333,28 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
           final isActive = _currentIndex == index;
           return GestureDetector(
             onTap: () {
+              if (isActive) return;
+              final Widget destination = switch (index) {
+                0 => const HomeScreen(),
+                1 => const LegalCategoriesScreen(),
+                2 => const CaseStatusScreen(),
+                3 => const MessagesScreen(),
+                _ => const AppSettingScreen(),
+              };
+
               if (index == 0) {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  MaterialPageRoute(builder: (_) => destination),
                   (_) => false,
                 );
-              } else if (index == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LegalCategoriesScreen(),
-                  ),
-                );
-              } else if (index == 2) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CaseStatusScreen()),
-                );
-              } else if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MessagesScreen()),
-                );
-              } else {
-                setState(() => _currentIndex = index);
+                return;
               }
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => destination),
+              );
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

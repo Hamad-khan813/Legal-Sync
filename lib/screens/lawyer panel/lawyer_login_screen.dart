@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:legal_sync/screens/lawyer%20panel/lawyer_dashboard_screen.dart';
 import 'package:legal_sync/screens/lawyer%20panel/lawyer_registration_screen.dart';
+import 'package:legal_sync/screens/onboarding/welcome_screen.dart';
 
 class LawyerLoginScreen extends StatefulWidget {
   const LawyerLoginScreen({super.key});
@@ -48,7 +49,7 @@ class _LawyerLoginScreenState extends State<LawyerLoginScreen> {
                     color: Color(0xFF131D31), // Dark fallback color
                     image: DecorationImage(
                       image: AssetImage(
-                        'assets/images/lawyer_login_bg.jpg',
+                        'images/lawyer_login_bg.jpg',
                       ), // Placeholder
                       fit: BoxFit.cover,
                       colorFilter: ColorFilter.mode(
@@ -84,6 +85,25 @@ class _LawyerLoginScreenState extends State<LawyerLoginScreen> {
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 12,
+                  left: 12,
+                  child: SafeArea(
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WelcomeScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_back_ios_new),
+                      color: Colors.white,
+                      tooltip: 'Back',
                     ),
                   ),
                 ),

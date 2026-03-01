@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'case_status_screen.dart';
 import 'messages_screen.dart';
 import 'app_setting_screen.dart';
 
@@ -308,22 +309,18 @@ class _LegalCategoriesScreenState extends State<LegalCategoriesScreen> {
           final isActive = index == 1;
           return GestureDetector(
             onTap: () {
-              if (index == 0) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                );
-              } else if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MessagesScreen()),
-                );
-              } else if (index == 4) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AppSettingScreen()),
-                );
-              }
+              if (isActive) return;
+              final Widget destination = switch (index) {
+                0 => const HomeScreen(),
+                2 => const CaseStatusScreen(),
+                3 => const MessagesScreen(),
+                4 => const AppSettingScreen(),
+                _ => const LegalCategoriesScreen(),
+              };
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => destination),
+              );
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

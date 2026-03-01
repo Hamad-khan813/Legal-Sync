@@ -70,10 +70,7 @@ class LawyerProfileScreen extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   useProfileImage
-                      ? Image.asset(
-                          'assets/images/profile.jpg',
-                          fit: BoxFit.cover,
-                        )
+                      ? Image.asset('images/profile.jpg', fit: BoxFit.cover)
                       : Container(
                           decoration: const BoxDecoration(
                             gradient: LinearGradient(

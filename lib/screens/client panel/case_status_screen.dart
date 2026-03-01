@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'messages_screen.dart';
 import 'home_screen.dart';
+import 'legal_categories_screen.dart';
 import 'app_setting_screen.dart';
 
 class CaseStatusScreen extends StatefulWidget {
@@ -628,25 +629,28 @@ class _CaseStatusScreenState extends State<CaseStatusScreen> {
           final isActive = _currentIndex == index;
           return GestureDetector(
             onTap: () {
+              if (isActive) return;
+              final Widget destination = switch (index) {
+                0 => const HomeScreen(),
+                1 => const LegalCategoriesScreen(),
+                3 => const MessagesScreen(),
+                4 => const AppSettingScreen(),
+                _ => const CaseStatusScreen(),
+              };
+
               if (index == 0) {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  MaterialPageRoute(builder: (_) => destination),
                   (_) => false,
                 );
-              } else if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MessagesScreen()),
-                );
-              } else if (index == 4) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AppSettingScreen()),
-                );
-              } else {
-                setState(() => _currentIndex = index);
+                return;
               }
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => destination),
+              );
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

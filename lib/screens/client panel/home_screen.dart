@@ -14,7 +14,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
   final TextEditingController _searchCtrl = TextEditingController();
   Map<String, dynamic>? _activeFilters;
 
@@ -171,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(10),
                         child: Image.asset(
-                          'assets/images/profile.jpg',
+                          'images/profile.jpg',
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -510,7 +509,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     height: 64,
                                     child: lawyer['useProfile'] as bool
                                         ? Image.asset(
-                                            'assets/images/profile.jpg',
+                                            'images/profile.jpg',
                                             fit: BoxFit.cover,
                                           )
                                         : Container(
@@ -671,35 +670,21 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: List.generate(5, (index) {
-          final isActive = _currentIndex == index;
+          final isActive = index == 0;
           return GestureDetector(
             onTap: () {
-              setState(() => _currentIndex = index);
-              if (index == 1) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LegalCategoriesScreen(),
-                  ),
-                );
-              } else if (index == 2) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const CaseStatusScreen()),
-                );
-              } else if (index == 3) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const MessagesScreen()),
-                );
-              } else if (index == 4) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const AppSettingScreen()),
-                );
-              } else {
-                setState(() => _currentIndex = index);
-              }
+              if (isActive) return;
+              final Widget destination = switch (index) {
+                1 => const LegalCategoriesScreen(),
+                2 => const CaseStatusScreen(),
+                3 => const MessagesScreen(),
+                4 => const AppSettingScreen(),
+                _ => const HomeScreen(),
+              };
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => destination),
+              );
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

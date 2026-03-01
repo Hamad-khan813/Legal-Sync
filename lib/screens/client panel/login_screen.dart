@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'home_screen.dart';
+import 'package:legal_sync/screens/onboarding/welcome_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -36,8 +37,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 300,
                   width: double.infinity,
                   child: Image.asset(
-                    'assets/images/login-screen.png',
+                    'images/login-screen.png',
                     fit: BoxFit.cover,
+                  ),
+                ),
+                Positioned(
+                  top: 12,
+                  left: 12,
+                  child: SafeArea(
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const WelcomeScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_back_ios_new),
+                      color: Colors.white,
+                      tooltip: 'Back',
+                    ),
                   ),
                 ),
                 // Gradient overlay at bottom of image

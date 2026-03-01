@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _goNext() async {
     // ⏳ Just wait 5 seconds
-    await Future.delayed(const Duration(seconds: 7));
+    await Future.delayed(const Duration(seconds: 3));
 
     if (!mounted) return;
 
