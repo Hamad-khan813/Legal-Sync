@@ -17,26 +17,24 @@ class _OtpErrorScreenState extends State<OtpErrorScreen>
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 800),
       vsync: this,
     );
-    
-    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.elasticOut,
-      ),
-    );
-    
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.3, 1.0, curve: Curves.easeInOut),
       ),
     );
-    
+
     // Start animation
     _controller.forward();
   }
@@ -56,7 +54,8 @@ class _OtpErrorScreenState extends State<OtpErrorScreen>
       context,
       MaterialPageRoute(
         builder: (context) => const OtpVerificationScreen(
-          phoneNumber: '+1 234 567 8900', // You might want to pass this from previous screen
+          phoneNumber:
+              '+1 234 567 8900', // You might want to pass this from previous screen
         ),
       ),
     );
@@ -83,7 +82,7 @@ class _OtpErrorScreenState extends State<OtpErrorScreen>
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFDC2626).withOpacity(0.2),
+                          color: const Color(0xFFDC2626).withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: const Color(0xFFDC2626),
@@ -153,9 +152,7 @@ class _OtpErrorScreenState extends State<OtpErrorScreen>
                         decoration: BoxDecoration(
                           color: const Color(0xFF1E1E1E),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: const Color(0xFF2A2A2A),
-                          ),
+                          border: Border.all(color: const Color(0xFF2A2A2A)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -169,9 +166,15 @@ class _OtpErrorScreenState extends State<OtpErrorScreen>
                               ),
                             ),
                             const SizedBox(height: 8),
-                            _buildIssueItem('Check if you entered the correct code'),
-                            _buildIssueItem('Make sure the code hasn\'t expired'),
-                            _buildIssueItem('Ensure you have good network connection'),
+                            _buildIssueItem(
+                              'Check if you entered the correct code',
+                            ),
+                            _buildIssueItem(
+                              'Make sure the code hasn\'t expired',
+                            ),
+                            _buildIssueItem(
+                              'Ensure you have good network connection',
+                            ),
                           ],
                         ),
                       ),
@@ -258,10 +261,7 @@ class _OtpErrorScreenState extends State<OtpErrorScreen>
                       opacity: _fadeAnimation.value,
                       child: Text(
                         'Still having issues? Contact support',
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
                     );
@@ -282,19 +282,12 @@ class _OtpErrorScreenState extends State<OtpErrorScreen>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.circle,
-            size: 6,
-            color: Color(0xFFDC2626),
-          ),
+          const Icon(Icons.circle, size: 6, color: Color(0xFFDC2626)),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 13,
-              ),
+              style: TextStyle(color: Colors.grey[500], fontSize: 13),
             ),
           ),
         ],

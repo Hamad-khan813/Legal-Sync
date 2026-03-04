@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:legal_sync/screens/client%20panel/login_screen.dart';
+import 'package:legal_sync/screens/client%20panel/notification_screen.dart';
 import 'lawyer_profile_screen.dart';
 import 'legal_categories_screen.dart';
 import 'messages_screen.dart';
@@ -159,7 +161,79 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      // Navigate to notifications screen
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E1E1E),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.notifications_none,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'logout') {
+                        // Show logout confirmation dialog
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Logout'),
+                              content: const Text(
+                                'Are you sure you want to log out?',
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pop(); // Close the dialog
+                                  },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    // Navigate to login screen
+                                    Navigator.of(
+                                      context,
+                                    ).pop(); // Close the dialog
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text('Logout'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return [
+                        const PopupMenuItem<String>(
+                          value: 'logout',
+                          child: Text('Logout'),
+                        ),
+                      ];
+                    },
                     child: Container(
                       width: 40,
                       height: 40,
@@ -674,13 +748,23 @@ class _HomeScreenState extends State<HomeScreen> {
           return GestureDetector(
             onTap: () {
               if (isActive) return;
-              final Widget destination = switch (index) {
-                1 => const LegalCategoriesScreen(),
-                2 => const CaseStatusScreen(),
-                3 => const MessagesScreen(),
-                4 => const AppSettingScreen(),
-                _ => const HomeScreen(),
-              };
+              Widget destination;
+              switch (index) {
+                case 1:
+                  destination = const LegalCategoriesScreen();
+                  break;
+                case 2:
+                  destination = const CaseStatusScreen();
+                  break;
+                case 3:
+                  destination = const MessagesScreen();
+                  break;
+                case 4:
+                  destination = const AppSettingScreen();
+                  break;
+                default:
+                  destination = const HomeScreen();
+              }
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => destination),

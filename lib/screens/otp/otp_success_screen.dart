@@ -17,37 +17,33 @@ class _OtpSuccessScreenState extends State<OtpSuccessScreen>
   @override
   void initState() {
     super.initState();
-    
+
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
-    
-    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.elasticOut,
-      ),
-    );
-    
+
+    _scaleAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
         curve: const Interval(0.5, 1.0, curve: Curves.easeInOut),
       ),
     );
-    
+
     // Start animation
     _controller.forward();
-    
+
     // Auto navigate after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       }
     });
@@ -62,9 +58,7 @@ class _OtpSuccessScreenState extends State<OtpSuccessScreen>
   void _continueToApp() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
     );
   }
 
@@ -89,7 +83,7 @@ class _OtpSuccessScreenState extends State<OtpSuccessScreen>
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          color: const Color(0xFF4CAF50).withOpacity(0.2),
+                          color: const Color(0xFF4CAF50).withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                           border: Border.all(
                             color: const Color(0xFF4CAF50),
@@ -190,10 +184,7 @@ class _OtpSuccessScreenState extends State<OtpSuccessScreen>
                       opacity: _fadeAnimation.value,
                       child: Text(
                         'You will be automatically redirected in a few seconds...',
-                        style: TextStyle(
-                          color: Colors.grey[500],
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.grey[500], fontSize: 12),
                         textAlign: TextAlign.center,
                       ),
                     );

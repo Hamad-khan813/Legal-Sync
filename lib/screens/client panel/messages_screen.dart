@@ -342,13 +342,23 @@ class _MessagesScreenState extends State<MessagesScreen>
           return GestureDetector(
             onTap: () {
               if (isActive) return;
-              final Widget destination = switch (index) {
-                0 => const HomeScreen(),
-                1 => const LegalCategoriesScreen(),
-                2 => const CaseStatusScreen(),
-                4 => const AppSettingScreen(),
-                _ => const MessagesScreen(),
-              };
+              Widget destination;
+              switch (index) {
+                case 0:
+                  destination = const HomeScreen();
+                  break;
+                case 1:
+                  destination = const LegalCategoriesScreen();
+                  break;
+                case 2:
+                  destination = const CaseStatusScreen();
+                  break;
+                case 4:
+                  destination = const AppSettingScreen();
+                  break;
+                default:
+                  destination = const MessagesScreen();
+              }
 
               if (index == 0) {
                 Navigator.pushAndRemoveUntil(
@@ -426,7 +436,7 @@ class _ChatList extends StatelessWidget {
         return GestureDetector(
           onTap: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => ChatDetailScreen(chat: chat)),
+            MaterialPageRoute(builder: (_) => _ChatDetailScreen(chat: chat)),
           ),
           child: Container(
             margin: const EdgeInsets.only(bottom: 10),
@@ -563,15 +573,15 @@ class _ChatList extends StatelessWidget {
 
 // ─── Chat detail ──────────────────────────────────────────────────────────────
 
-class ChatDetailScreen extends StatefulWidget {
+class _ChatDetailScreen extends StatefulWidget {
   final _ChatItem chat;
-  const ChatDetailScreen({super.key, required this.chat});
+  const _ChatDetailScreen({required this.chat});
 
   @override
-  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
+  State<_ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
-class _ChatDetailScreenState extends State<ChatDetailScreen> {
+class _ChatDetailScreenState extends State<_ChatDetailScreen> {
   final TextEditingController _ctrl = TextEditingController();
   final List<Map<String, dynamic>> _messages = [
     {

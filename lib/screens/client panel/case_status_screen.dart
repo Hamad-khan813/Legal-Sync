@@ -630,13 +630,23 @@ class _CaseStatusScreenState extends State<CaseStatusScreen> {
           return GestureDetector(
             onTap: () {
               if (isActive) return;
-              final Widget destination = switch (index) {
-                0 => const HomeScreen(),
-                1 => const LegalCategoriesScreen(),
-                3 => const MessagesScreen(),
-                4 => const AppSettingScreen(),
-                _ => const CaseStatusScreen(),
-              };
+              Widget destination;
+              switch (index) {
+                case 0:
+                  destination = const HomeScreen();
+                  break;
+                case 1:
+                  destination = const LegalCategoriesScreen();
+                  break;
+                case 3:
+                  destination = const MessagesScreen();
+                  break;
+                case 4:
+                  destination = const AppSettingScreen();
+                  break;
+                default:
+                  destination = const CaseStatusScreen();
+              }
 
               if (index == 0) {
                 Navigator.pushAndRemoveUntil(

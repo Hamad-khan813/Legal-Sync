@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:legal_sync/screens/client%20panel/view_all_documents_screen.dart';
+import 'package:legal_sync/screens/client%20panel/billing_details_screen.dart';
+import 'package:legal_sync/screens/client%20panel/payment_method_screen.dart';
+import 'package:legal_sync/screens/client%20panel/update_password_screen.dart';
 import 'home_screen.dart';
 import 'case_status_screen.dart';
 import 'messages_screen.dart';
@@ -28,24 +32,8 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                  ),
                   const Text(
                     'Settings',
                     style: TextStyle(
@@ -54,7 +42,6 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 40), // Balance the row
                 ],
               ),
             ),
@@ -173,7 +160,15 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
                       iconBgColor: const Color(0xFFFF6B00),
                       title: 'Legal Documents',
                       subtitle: 'Manage your shared files and e-signs',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                const ViewAllDocumentsScreen(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 24),
 
@@ -185,14 +180,28 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
                       iconBgColor: const Color(0xFF7C3AED),
                       title: 'Payment Methods',
                       subtitle: 'Visa ending in **** 4242',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PaymentMethodScreen(),
+                          ),
+                        );
+                      },
                     ),
                     _SettingRow(
                       icon: Icons.receipt_long_outlined,
                       iconBgColor: const Color(0xFF0891B2),
                       title: 'Billing History',
                       subtitle: 'View and download past invoices',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const BillingDetailsScreen(),
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(height: 24),
 
@@ -204,7 +213,14 @@ class _AppSettingScreenState extends State<AppSettingScreen> {
                       iconBgColor: const Color(0xFFDC2626),
                       title: 'Change Password',
                       subtitle: 'Last updated 3 months ago',
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const UpdatePasswordScreen(),
+                          ),
+                        );
+                      },
                     ),
                     _SettingRow(
                       icon: Icons.security_outlined,

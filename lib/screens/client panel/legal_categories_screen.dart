@@ -310,13 +310,23 @@ class _LegalCategoriesScreenState extends State<LegalCategoriesScreen> {
           return GestureDetector(
             onTap: () {
               if (isActive) return;
-              final Widget destination = switch (index) {
-                0 => const HomeScreen(),
-                2 => const CaseStatusScreen(),
-                3 => const MessagesScreen(),
-                4 => const AppSettingScreen(),
-                _ => const LegalCategoriesScreen(),
-              };
+              Widget destination;
+              switch (index) {
+                case 0:
+                  destination = const HomeScreen();
+                  break;
+                case 2:
+                  destination = const CaseStatusScreen();
+                  break;
+                case 3:
+                  destination = const MessagesScreen();
+                  break;
+                case 4:
+                  destination = const AppSettingScreen();
+                  break;
+                default:
+                  destination = const LegalCategoriesScreen();
+              }
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (_) => destination),
@@ -378,7 +388,7 @@ class _CategoryCard extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: (category['color'] as Color).withOpacity(0.05),
+                  color: (category['color'] as Color).withValues(alpha: 0.05),
                   shape: BoxShape.circle,
                 ),
               ),
@@ -396,7 +406,9 @@ class _CategoryCard extends StatelessWidget {
                       color: category['bgColor'] as Color,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: (category['color'] as Color).withOpacity(0.2),
+                        color: (category['color'] as Color).withValues(
+                          alpha: 0.2,
+                        ),
                       ),
                     ),
                     child: Icon(

@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:legal_sync/firebase_options.dart';
-import 'package:legal_sync/screens/otp/otp_input_screen.dart';
 import 'package:legal_sync/screens/splash_screen.dart';
 
 void main() async {
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: OtpInputScreen(),
+      home: SplashScreen(),
     );
   }
 }

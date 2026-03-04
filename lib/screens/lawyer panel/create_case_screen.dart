@@ -247,7 +247,7 @@ class _CreateCaseScreenState extends State<CreateCaseScreen> {
         Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(
-            color: const Color(0xFFFF6B00).withOpacity(0.1),
+            color: const Color(0xFFFF6B00).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, color: const Color(0xFFFF6B00), size: 20),
